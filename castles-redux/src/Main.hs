@@ -106,7 +106,6 @@ runGA fixedPop startingPop carryover selectionSize tournamentSize pctCrossover m
   go 0 startingPop 
   where
     popSize = V.length startingPop
-    
     crossoverCount = (round $ fromIntegral (popSize-carryover) * pctCrossover) `div` 2
     mutationSize = selectionSize - 2*crossoverCount
     
