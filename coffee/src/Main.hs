@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Monad
+import Data.Bifunctor
 import Data.Vector.Unboxed (Vector)
 import qualified Data.Vector.Unboxed as V
 import Data.Vector.Unboxed.Mutable (MVector)
@@ -39,7 +40,8 @@ sample g n wiggleAmnt dist = V.replicateM n pickOne >>= V.mapM wiggle
 runRound :: MTGen -> Int -> Int -> Double -> [(Double,Double)] -> IO [(Double,Double)]
 runRound g turns nPlayers wiggle distribution = do
   players <- sample g nPlayers wiggle distribution
-  scores <- MV.replicate nPlayers (0 :: Double)
+  scores <- MV.replicate nPlayers (0,0)
+  -- scores <- MV.replicate nPlayers 0
 
   let runTrials remaining coffeePot =
         if remaining <= 0 then return () else do
@@ -48,14 +50,18 @@ runRound g turns nPlayers wiggle distribution = do
           let cupSize = players V.! player
               coffeePot' = coffeePot - cupSize
           if coffeePot' <= 0
-            then runTrials (remaining - 1) 1
+            then do
+            MV.modify scores (second (+ 1)) player
+            runTrials (remaining - 1) 1
             else do
-            MV.modify scores (+ cupSize) player
+            MV.modify scores (bimap (+ cupSize) (+ 1)) player
+            -- MV.modify scores (+ cupSize) player
             runTrials (remaining - 1) coffeePot'
 
   runTrials turns 1
 
-  finalScores <- V.freeze scores
+  finalScores <- V.map (uncurry (/)) <$> V.freeze scores
+  -- finalScores <- V.freeze scores
 
   return $ V.toList $ V.zip players finalScores
 
@@ -75,15 +81,22 @@ main = do
         if n <= 0
         then return []
         else do
-          results <- runRound g (10^9) 200 0.03 lastRoundResults
+          results <- runRound g (8*10^10) 300 0.025 lastRoundResults
           (results :) <$> loop (n-1) results
       initialDist = [(x,1) | x <- [0.05,0.10..0.95]]
 
-  results <- loop 10 initialDist
+  results <- loop 1 initialDist
 
   toFile def "results.svg" $
     forM_ (zip results [1..]) $
     \(result,i) -> (plot $ points ("run "++show i) result)
+
+  toFile def "results-zoom.svg" $
+    forM_ (zip results [1..]) $
+    \(result,i) -> (plot $ points ("run "++show i)
+                           (filter ((>0.4).fst) result))
+
+                   
 
 
 
