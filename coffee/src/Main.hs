@@ -81,11 +81,11 @@ main = do
         if n <= 0
         then return []
         else do
-          results <- runRound g (10^8) 100 0.005 lastRoundResults
+          results <- runRound g (10^8) 100 0.0045 lastRoundResults
           (results :) <$> loop (n-1) results
       -- initialDist = [(x,1) | x <- [0.05,0.10..0.95]]
       -- initialDist = [(x,(x-0.5)^2+0.01) | x <- [0.01,0.02..0.98]]
-      initialDist = [(0.7,1),(0.8,30),(0.9,30),(0.21,39)]
+      initialDist = [(0.7,1),(0.29,49)] ++ [(x,2.5) | x <- [0.79,0.80 .. 0.99]]
 
   results <- loop 1 initialDist
 

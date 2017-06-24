@@ -10,4 +10,4 @@ high-end-distribution-results.svg shows the results if approximately 90% of play
 
 spoiler-distribution-results.svg shows the effect of a small number of players with choices <0.2, assuming the vast majority of players choose something close to 0.8 or 1.
 
-collusion-distribution shows the effect of a large number of players choosing a value of 0.21 in order to boost the score of players choosing 0.7.
+collusion-distribution shows the effect of a large number of players choosing a value of 0.29 in order to boost the score of players choosing 0.7.
