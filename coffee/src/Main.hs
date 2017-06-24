@@ -81,21 +81,24 @@ main = do
         if n <= 0
         then return []
         else do
-          results <- runRound g (8*10^10) 300 0.025 lastRoundResults
+          results <- runRound g (10^8) 100 0.005 lastRoundResults
           (results :) <$> loop (n-1) results
-      initialDist = [(x,1) | x <- [0.05,0.10..0.95]]
+      -- initialDist = [(x,1) | x <- [0.05,0.10..0.95]]
+      -- initialDist = [(x,(x-0.5)^2+0.01) | x <- [0.01,0.02..0.98]]
+      initialDist = [(0.7,1),(0.8,30),(0.9,30),(0.21,39)]
 
   results <- loop 1 initialDist
 
-  toFile def "results.svg" $
+  toFile def "collusion-distribution-results.svg" $
     forM_ (zip results [1..]) $
     \(result,i) -> (plot $ points ("run "++show i) result)
 
+  {-
   toFile def "results-zoom.svg" $
     forM_ (zip results [1..]) $
     \(result,i) -> (plot $ points ("run "++show i)
                            (filter ((>0.4).fst) result))
-
+  -}
                    
 
 
